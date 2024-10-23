@@ -11,6 +11,9 @@ class SecretaryPage extends StatefulWidget {
 class _SecretaryPageState extends State<SecretaryPage> {
   List<Student> students = [];
   List<Professor> professors = [];
+  List<String> announcements = [];
+  final TextEditingController _announcementController = TextEditingController();
+  final TextEditingController _studentController = TextEditingController();
 
   @override
   void initState() {
@@ -27,6 +30,28 @@ class _SecretaryPageState extends State<SecretaryPage> {
     });
   }
 
+  void _addStudent() {
+    setState(() {
+      students.add(Student(name: _studentController.text));
+      DataManager.saveStudents(students);
+      _studentController.clear();
+    });
+  }
+
+  void _removeStudent(Student student) {
+    setState(() {
+      students.remove(student);
+      DataManager.saveStudents(students);
+    });
+  }
+
+  void _addAnnouncement() {
+    setState(() {
+      announcements.add(_announcementController.text);
+      _announcementController.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,21 +62,44 @@ class _SecretaryPageState extends State<SecretaryPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            TextField(
+              controller: _studentController,
+              decoration: InputDecoration(labelText: 'Enter Student Name'),
+            ),
+            ElevatedButton(
+              onPressed: _addStudent,
+              child: Text('Add Student'),
+            ),
             Expanded(
-              child: ListView(
-                children: [
-                  Text('Professors:', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ...professors.map((prof) => ListTile(title: Text(prof.name))),
-                  SizedBox(height: 20),
-                  Text('Students and Grades:', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ...students.map((student) {
-                    return ListTile(
-                      title: Text(student.name),
-                      subtitle: Text(
-                          'Midterm: ${student.midterm}, Final: ${student.finalScore}, Average: ${student.calculateAverage()}'),
-                    );
-                  }),
-                ],
+              child: ListView.builder(
+                itemCount: students.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(students[index].name),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _removeStudent(students[index]),
+                    ),
+                  );
+                },
+              ),
+            ),
+            TextField(
+              controller: _announcementController,
+              decoration: InputDecoration(labelText: 'Enter Announcement'),
+            ),
+            ElevatedButton(
+              onPressed: _addAnnouncement,
+              child: Text('Add Announcement'),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: announcements.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(announcements[index]),
+                  );
+                },
               ),
             ),
           ],

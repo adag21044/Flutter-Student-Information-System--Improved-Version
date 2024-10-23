@@ -8,18 +8,13 @@ class StudentPage extends StatefulWidget {
 }
 
 class _StudentPageState extends State<StudentPage> {
-  List<Student> students = [];
+  final TextEditingController _todoController = TextEditingController();
+  List<String> todoList = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _loadStudents();
-  }
-
-  Future<void> _loadStudents() async {
-    List<Student> loadedStudents = await DataManager.loadStudents();
+  void _addTodoItem() {
     setState(() {
-      students = loadedStudents;
+      todoList.add(_todoController.text);
+      _todoController.clear();
     });
   }
 
@@ -29,16 +24,27 @@ class _StudentPageState extends State<StudentPage> {
       appBar: AppBar(
         title: Text('Student Page'),
       ),
-      body: ListView.builder(
-        itemCount: students.length,
-        itemBuilder: (context, index) {
-          Student student = students[index];
-          return ListTile(
-            title: Text(student.name),
-            subtitle: Text(
-                'Midterm: ${student.midterm}, Final: ${student.finalScore}, Average: ${student.calculateAverage()}'),
-          );
-        },
+      body: Column(
+        children: [
+          TextField(
+            controller: _todoController,
+            decoration: InputDecoration(labelText: 'Enter Task'),
+          ),
+          ElevatedButton(
+            onPressed: _addTodoItem,
+            child: Text('Add Task'),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: todoList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(todoList[index]),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
