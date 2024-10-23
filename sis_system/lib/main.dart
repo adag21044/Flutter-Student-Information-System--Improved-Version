@@ -29,6 +29,13 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   String _selectedRole = 'Student';
+  String _errorMessage = '';
+
+  final Map<String, String> _validUsers = {
+    'student': 'student123',
+    'professor': 'professor123',
+    'secretary': 'secretary123',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +80,14 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: Text('Login'),
             ),
+            if (_errorMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  _errorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
           ],
         ),
       ),
@@ -80,21 +95,35 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login(BuildContext context) {
-    if (_selectedRole == 'Student') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => StudentPage()),
-      );
-    } else if (_selectedRole == 'Professor') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ProfessorPage()),
-      );
-    } else if (_selectedRole == 'Secretary') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => SecretaryPage()),
-      );
+    String username = _usernameController.text;
+    String password = _passwordController.text;
+
+    if (_validUsers.containsKey(_selectedRole.toLowerCase()) &&
+        _validUsers[_selectedRole.toLowerCase()] == password) {
+      setState(() {
+        _errorMessage = '';
+      });
+
+      if (_selectedRole == 'Student') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => StudentPage()),
+        );
+      } else if (_selectedRole == 'Professor') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfessorPage()),
+        );
+      } else if (_selectedRole == 'Secretary') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SecretaryPage()),
+        );
+      }
+    } else {
+      setState(() {
+        _errorMessage = 'Invalid username or password';
+      });
     }
   }
 }
